@@ -3,11 +3,13 @@ package com.example.application.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.example.application.port.in.CreateTaskUseCase;
+import com.example.application.port.in.DeleteTaskUseCase;
 import com.example.application.port.in.GetTaskUseCase;
 import com.example.application.port.in.ListTaskUseCase;
+import com.example.application.port.in.UpdateTaskUseCase;
+import com.example.application.port.in.UploadTaskImageUseCase;
+import com.example.application.port.out.TaskImageStoragePort;
 import com.example.application.port.out.TaskRepositoryPort;
 import com.example.domain.exception.TaskNotFoundException;
 import com.example.domain.model.Task;
@@ -15,7 +17,6 @@ import com.example.domain.model.Task;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Service
 /* ¿Es correcta una anotacion de Spring aqui? 
  * 
  * Los mas puristas dirian que NO, pero tiene un coste implementar esto
@@ -33,10 +34,12 @@ import lombok.RequiredArgsConstructor;
  * hay que crear cuando se levanta el contexto de Spring
  * 
  * */
-public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskUseCase {
+public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskUseCase,
+		DeleteTaskUseCase, UpdateTaskUseCase, UploadTaskImageUseCase {
 
 	private final TaskRepositoryPort taskRepositoryPort;
-	
+	private final TaskImageStoragePort taskImageStoragePort;
+
 	@Override
 	public Task create(Task task) {
 		// TODO Auto-generated method stub
@@ -55,5 +58,32 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskU
 		// TODO Auto-generated method stub
 		return taskRepositoryPort.findAll();
 	}
+
+	@Override
+	public void deleteById(long id) {
+		getById(id);
+		taskRepositoryPort.deleteById(id);
+	}
+
+	@Override
+	public Task update(long id, Task changes) {
+		Task task = getById(id);
+
+		if (changes.getTitle() != null)
+			task.setTitle(changes.getTitle());
+		if (changes.getDescription() != null)
+			task.setDescription(changes.getDescription());
+
+		return taskRepositoryPort.save(task);
+	}
+
+	@Override
+	public Task uploadImage(long taskId, byte[] imageData, String originalFilename) {
+		Task task = getById(taskId);
+		String path = taskImageStoragePort.store(taskId, imageData, originalFilename);
+		task.attachImage(path);
+		return taskRepositoryPort.save(task);
+	}
+
 
 }

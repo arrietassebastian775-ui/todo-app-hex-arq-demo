@@ -25,6 +25,7 @@ public class Task {
 	private TaskStatus status;
 	private LocalDateTime createdAt;
 	private LocalDateTime completedAt;
+	private String imagePath;
 	
 	/* Los metodos siguientes aportan comportamiento, es decir, las reglas de negocio para la gestion 
 	 * de las tareas*/
@@ -54,5 +55,9 @@ public class Task {
 			this.status = TaskStatus.PENDING;
 		if (this.createdAt == null)
 			this.createdAt = LocalDateTime.now();
+	}
+
+	public void attachImage(String imagePath) {
+		this.imagePath = imagePath;
 	}
 }
