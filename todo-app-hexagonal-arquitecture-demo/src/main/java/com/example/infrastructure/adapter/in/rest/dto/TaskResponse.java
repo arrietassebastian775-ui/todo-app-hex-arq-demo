@@ -20,6 +20,7 @@ public class TaskResponse {
 	private TaskStatus status;
 	private LocalDateTime createdAt;
 	private LocalDateTime completedAt;
+	private String imagePath;
 	
 	public static TaskResponse from(Task task) {
 		
@@ -30,6 +31,7 @@ public class TaskResponse {
 				.status(task.getStatus())
 				.createdAt(task.getCreatedAt())
 				.completedAt(task.getCompletedAt())
+				.imagePath(task.getImagePath())
 				.build();
 	}
 	
